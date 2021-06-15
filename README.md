@@ -1,2 +1,2 @@
-# Games-Repo
-This repository contain games of the course: CS50's Introduction to Game Development.
+# Games-Repo 🎮
+This repository contain games of CS50's Introduction to Game Development course and some other experiments.
