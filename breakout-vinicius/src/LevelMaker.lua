@@ -33,6 +33,11 @@ LevelMaker = Class{}
 function LevelMaker.createMap(level)
     local bricks = {}
 
+    -- chance of spawning a locked brick in the level
+    local lockedBrick = math.random(1, 5)
+    local whichRow = 1
+    local whichCols = 1
+
     -- randomly choose the number of rows
     local numRows = math.random(1, 5)
 
@@ -47,8 +52,15 @@ function LevelMaker.createMap(level)
     -- highest color of the highest tier, no higher than 5
     local highestColor = math.min(5, level % 5 + 3)
 
+
+    whichRow = math.random(1, numRows)
+    whichCols = math.random(1, numCols - 1)
+
     -- lay out bricks such that they touch each other and fill the space
     for y = 1, numRows do
+        -- adding a local variable to do comparations
+        local y = y
+
         -- whether we want to enable skipping for this row
         local skipPattern = math.random(1, 2) == 1 and true or false
 
@@ -72,11 +84,16 @@ function LevelMaker.createMap(level)
         local solidTier = math.random(0, highestTier)
 
         for x = 1, numCols do
+            -- adding a local variable to do comparations
+            local x = x
+
             -- if skipping is turned on and we're on a skip iteration...
             if skipPattern and skipFlag then
                 -- turn skipping off for the next iteration
                 skipFlag = not skipFlag
-
+                if whichCols == x then
+                    whichCols = whichCols + 1
+                end
                 -- Lua doesn't have a continue statement, so this is the workaround
                 goto continue
             else
@@ -95,22 +112,37 @@ function LevelMaker.createMap(level)
                 y * 16                  -- just use y * 16, since we need top padding anyway
             )
 
-            -- if we're alternating, figure out which color/tier we're on
-            if alternatePattern and alternateFlag then
-                b.color = alternateColor1
-                b.tier = alternateTier1
-                alternateFlag = not alternateFlag
-            else
-                b.color = alternateColor2
-                b.tier = alternateTier2
-                alternateFlag = not alternateFlag
-            end
 
-            -- if not alternating and we made it here, use the solid color/tier
-            if not alternatePattern then
-                b.color = solidColor
-                b.tier = solidTier
-            end 
+            if (whichRow == y and whichCols == x) and lockedBrick == 5 then
+
+                b.color = 6
+                b.tier = 1
+                if alternatePattern and alternateFlag then
+                    alternateFlag = not alternateFlag
+
+                end
+
+            else
+                --   b.color = 
+                -- if we're alternating, figure out which color/tier we're on
+                if alternatePattern and alternateFlag then
+                    b.color = alternateColor1
+                    b.tier = alternateTier1
+
+                    alternateFlag = not alternateFlag
+                else
+                    b.color = alternateColor2
+                    b.tier = alternateTier2
+
+                    alternateFlag = not alternateFlag
+                end
+
+                -- if not alternating and we made it here, use the solid color/tier
+                if not alternatePattern then
+                    b.color = solidColor
+                    b.tier = solidTier
+                end
+            end
 
             table.insert(bricks, b)
 

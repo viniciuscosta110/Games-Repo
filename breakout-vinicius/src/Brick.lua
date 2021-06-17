@@ -47,6 +47,12 @@ paletteColors = {
         ['r'] = 251,
         ['g'] = 242,
         ['b'] = 54
+    },
+    --black
+    [6] = {
+        ['r'] = 0,
+        ['g'] = 0,
+        ['b'] = 0
     }
 }
 
@@ -84,10 +90,11 @@ end
     Triggers a hit on the brick, taking it out of play if at 0 health or
     changing its color otherwise.
 ]]
-function Brick:hit()
+function Brick:hit(key)
     -- set the particle system to interpolate between two colors; in this case, we give
     -- it our self.color but with varying alpha; brighter for higher tiers, fading to 0
-    -- over the particle's lifetime (the second color)
+-- over the particle's lifetime (the second color)
+    
     self.psystem:setColors(
         paletteColors[self.color].r / 255,
         paletteColors[self.color].g / 255,
@@ -106,7 +113,11 @@ function Brick:hit()
 
     -- if we're at a higher tier than the base, we need to go down a tier
     -- if we're already at the lowest color, else just go down a color
-    if self.tier > 0 then
+    if self.color == 6 then
+        if self.tier == 0 then
+            self.inPlay = false
+        end
+    elseif self.tier > 0 then
         if self.color == 1 then
             self.tier = self.tier - 1
             self.color = 5

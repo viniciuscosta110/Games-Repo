@@ -67,6 +67,20 @@ function Paddle:update(dt)
     end
 end
 
+function Paddle:shrink()
+    if self.size > 1 then
+        self.size = self.size - 1
+        self.width = self.width - 32
+    end
+end
+
+function Paddle:grow()
+    if self.size < 4 then
+        self.size = self.size + 1
+        self.width = self.width + 32
+    end
+end
+
 --[[
     Render the paddle by drawing the main texture, passing in the quad
     that corresponds to the proper skin and size.
