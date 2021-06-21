@@ -142,7 +142,7 @@ function PlayState:update(dt)
                 gSounds['error']:play()
                 self.highlightedTile = nil
             else
-                
+                self.canInput = false
                 -- swap grid positions of tiles
                 local tempX = self.highlightedTile.gridX
                 local tempY = self.highlightedTile.gridY
@@ -160,16 +160,41 @@ function PlayState:update(dt)
 
                 self.board.tiles[newTile.gridY][newTile.gridX] = newTile
 
-                -- tween coordinates between the two so they swap
-                Timer.tween(0.1, {
-                    [self.highlightedTile] = {x = newTile.x, y = newTile.y},
-                    [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
-                })
-                
-                -- once the swap is finished, we can tween falling blocks as needed
-                :finish(function()
-                    self:calculateMatches()
-                end)
+                if not self.board:calculateMatches() then
+
+                    local highlightedTile = self.highlightedTile
+                    local tempX = highlightedTile.gridX
+                    local tempY = highlightedTile.gridY
+
+                    highlightedTile.gridX = newTile.gridX
+                    highlightedTile.gridY = newTile.gridY
+                    newTile.gridX = tempX
+                    newTile.gridY = tempY
+
+                    self.board.tiles[highlightedTile.gridY][highlightedTile.gridX] =
+                        highlightedTile
+
+                    self.board.tiles[newTile.gridY][newTile.gridX] = newTile
+
+                    local highlightedTile = self.highlightedTile
+
+                    gSounds['error']:play()
+                    self.highlightedTile = nil
+                    
+                    self.canInput = true
+                else
+
+                    -- tween coordinates between the two so they swap
+                    Timer.tween(0.1, {
+                        [self.highlightedTile] = {x = newTile.x, y = newTile.y},
+                        [newTile] = {x = self.highlightedTile.x, y = self.highlightedTile.y}
+                    })
+                    
+                    -- once the swap is finished, we can tween falling blocks as needed
+                    :finish(function()
+                        self:calculateMatches()
+                    end)
+                end
             end
         end
     end
