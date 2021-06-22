@@ -32,7 +32,11 @@ function Board:initializeTiles()
         for tileX = 1, 8 do
             
             -- create a new tile at X,Y with a random color and variety
-            table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(self.level % 6)))
+            if self.level > 6 then
+                table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(6)))
+            else
+                table.insert(self.tiles[tileY], Tile(tileX, tileY, math.random(18), math.random(self.level)))
+            end
         end
     end
 
@@ -238,9 +242,14 @@ function Board:getFallingTiles()
 
             -- if the tile is nil, we need to add a new one
             if not tile then
-
+                local tile = nil
                 -- new tile with random color and variety
-                local tile = Tile(x, y, math.random(18), math.random(self.level % 6))
+                if self.level > 6 then
+                    tile = Tile(x, y, math.random(18), math.random(6))
+                else
+                    tile = Tile(x, y, math.random(18), math.random(self.level))
+                end
+
                 tile.y = -32
                 self.tiles[y][x] = tile
 
@@ -253,6 +262,69 @@ function Board:getFallingTiles()
     end
 
     return tweens
+end
+
+function Board:existMatches()
+
+    for y = 1, 8 do
+        for x = 1, 7 do
+            
+            local auxBoard = Class.clone(self)
+            local highlightedTile = auxBoard.tiles[y][x+1]
+
+            local tempX = highlightedTile.gridX
+            local tempY = highlightedTile.gridY
+
+            local newTile = auxBoard.tiles[y][x]
+
+            highlightedTile.gridX = newTile.gridX
+            highlightedTile.gridY = newTile.gridY
+            newTile.gridX = tempX
+            newTile.gridY = tempY
+
+            -- swap tiles in the tiles table
+            auxBoard.tiles[highlightedTile.gridY][highlightedTile.gridX] =
+                highlightedTile
+
+            auxBoard.tiles[newTile.gridY][newTile.gridX] = newTile
+
+            if auxBoard:calculateMatches() then
+
+                return true
+            end
+        end
+    end
+
+    for x = 1, 8 do
+        for y = 1, 7 do
+            
+            local auxBoard = Class.clone(self)
+            local highlightedTile = auxBoard.tiles[y+1][x]
+
+            local tempX = highlightedTile.gridX
+            local tempY = highlightedTile.gridY
+
+            local newTile = auxBoard.tiles[y][x]
+
+            highlightedTile.gridX = newTile.gridX
+            highlightedTile.gridY = newTile.gridY
+            newTile.gridX = tempX
+            newTile.gridY = tempY
+
+            -- swap tiles in the tiles table
+            auxBoard.tiles[highlightedTile.gridY][highlightedTile.gridX] =
+                highlightedTile
+
+            auxBoard.tiles[newTile.gridY][newTile.gridX] = newTile
+
+            if auxBoard:calculateMatches() then
+
+                return true
+            end
+        end
+    end
+
+    return false
 end
 
 function Board:render()

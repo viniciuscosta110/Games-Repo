@@ -163,8 +163,8 @@ function PlayState:update(dt)
                 if not self.board:calculateMatches() then
 
                     local highlightedTile = self.highlightedTile
-                    local tempX = highlightedTile.gridX
-                    local tempY = highlightedTile.gridY
+                    tempX = highlightedTile.gridX
+                    tempY = highlightedTile.gridY
 
                     highlightedTile.gridX = newTile.gridX
                     highlightedTile.gridY = newTile.gridY
@@ -198,7 +198,11 @@ function PlayState:update(dt)
             end
         end
     end
-
+    
+    if not self.board:existMatches() then
+        self.board:initializeTiles()
+    end
+    
     Timer.update(dt)
 end
 
