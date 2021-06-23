@@ -31,7 +31,7 @@ function Tile:init(x, y, color, variety)
     self.g = math.random(255)/255
     self.b = math.random(255)/255
 
-    Timer.every(1, function()
+    Timer.every(0.2, function()
         self.r = math.random(255)/255
         self.g = math.random(255)/255
         self.b = math.random(255)/255
@@ -52,9 +52,9 @@ function Tile:render(x, y)
         self.x + x, self.y + y)
 
     if self.shiny then
-        love.graphics.setColor(self.r, self.g, self.b, 200/255)
+        love.graphics.setColor(self.r, self.g, self.b, 150/255)
         
-        love.graphics.rectangle('line', (self.gridX - 1) * 32 + (VIRTUAL_WIDTH - 272)+2, 
+        love.graphics.rectangle('line', (self.gridX - 1) * 32 + (VIRTUAL_WIDTH - 272) + 2, 
             (self.gridY - 1) * 32 + 18, 30, 30, 4)
     end
 end
