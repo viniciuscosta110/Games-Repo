@@ -13,6 +13,7 @@ Player = Class{__includes = Entity}
 function Player:init(def)
     Entity.init(self, def)
     self.score = 0
+    self.key = false
 end
 
 function Player:update(dt)
@@ -77,6 +78,13 @@ function Player:checkObjectCollisions()
             elseif object.consumable then
                 object.onConsume(self)
                 table.remove(self.level.objects, k)
+            elseif object.lock then
+                table.insert(collidedObjects, object)
+                
+                if self.key then
+                    table.remove(self.level.objects, k)
+                    gSounds['lock']:play()
+                end
             end
         end
     end
