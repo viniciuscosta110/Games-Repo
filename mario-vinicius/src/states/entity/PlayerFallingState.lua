@@ -61,7 +61,7 @@ function PlayerFallingState:update(dt)
     -- check if we've collided with any collidable game objects
     for k, object in pairs(self.player.level.objects) do
         if object:collides(self.player) then
-            if object.solid then
+            if object.solid or object.lock then
                 self.player.dy = 0
                 self.player.y = object.y - self.player.height
 
@@ -73,6 +73,11 @@ function PlayerFallingState:update(dt)
             elseif object.consumable then
                 object.onConsume(self.player)
                 table.remove(self.player.level.objects, k)
+            elseif object.lock then
+                if self.player.key then
+                    table.remove(self.player.level.objects, k)
+                    gSounds['lock']:play()
+                end
             end
         end
     end

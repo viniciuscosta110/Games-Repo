@@ -15,6 +15,11 @@ function LevelMaker.generate(width, height)
     local entities = {}
     local objects = {}
 
+    local lock_obj = {}
+    local key = false
+    local lock = false
+    local key_frame = math.random(4)
+
     local tileID = TILE_ID_GROUND
     
     -- whether we should draw our tiles with toppers
@@ -157,6 +162,50 @@ function LevelMaker.generate(width, height)
                         end
                     }
                 )
+            -- CS50: chance to spawn a key and a lock
+            elseif math.random(10) == 1 and not key then
+                key = true
+                
+                table.insert(objects,
+
+                    GameObject{
+                        texture = 'keys_and_locks',
+                        x = (x - 1) * TILE_SIZE,
+                        y = (blockHeight - 1) * TILE_SIZE,
+                        width = 16,
+                        height = 16,
+
+                        -- make a random variant
+                        frame = key_frame,
+                        collidable = true,
+                        consumable = true,
+                        solid = false,
+
+                        -- collision function takes itself
+                        onConsume = function(player, object)
+                            gSounds['pickup']:play()
+                            player.key = true
+                        end
+                    }
+                )
+            else if math.random(10) == 1 and not lock then
+                lock = true
+
+                lock_obj = GameObject{
+                    texture = 'keys_and_locks',
+                    x = (x - 1) * TILE_SIZE,
+                    y = (blockHeight - 1) * TILE_SIZE,
+                    width = 16,
+                    height = 16,
+
+                    -- make a random variant
+                    frame = key_frame + 4,
+                    collidable = true,
+                    lock = true,
+                }
+
+                table.insert(objects, lock_obj)
+                end
             end
         end
     end

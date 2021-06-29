@@ -67,6 +67,16 @@ function PlayerJumpState:update(dt)
             elseif object.consumable then
                 object.onConsume(self.player)
                 table.remove(self.player.level.objects, k)
+            elseif object.lock then
+                
+                self.player.y = object.y + object.height
+                self.player.dy = 0
+                self.player:changeState('falling')
+
+                if self.player.key then
+                    gSounds['lock']:play()
+                    table.remove(self.player.level.objects, k)
+                end
             end
         end
     end
