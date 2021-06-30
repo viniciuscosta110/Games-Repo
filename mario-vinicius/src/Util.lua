@@ -15,12 +15,18 @@
     width and a height for the tiles therein, split the texture into
     all of the quads by simply dividing it evenly.
 ]]
-function GenerateQuads(atlas, tilewidth, tileheight)
+function GenerateQuads(atlas, tilewidth, tileheight, sheet_size)
     local sheetWidth = atlas:getWidth() / tilewidth
     local sheetHeight = atlas:getHeight() / tileheight
 
     local sheetCounter = 1
     local spritesheet = {}
+
+    if sheet_size then
+        sheetWidth = sheet_size
+    else
+        sheetWidth = atlas:getWidth() / tilewidth
+    end
 
     for y = 0, sheetHeight - 1 do
         for x = 0, sheetWidth - 1 do

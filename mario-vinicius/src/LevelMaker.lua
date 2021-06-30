@@ -16,9 +16,17 @@ function LevelMaker.generate(width, height)
     local objects = {}
 
     local lock_obj = {}
+    local key_obj = {}
+
     local key = false
     local lock = false
     local key_frame = math.random(4)
+
+    local pole_obj = {}
+    local flag_obj = {}
+
+    local pole_frame = math.random(6)
+    local flag_frame = 7 + 9 * (math.random(4) - 1)
 
     local tileID = TILE_ID_GROUND
     
@@ -59,8 +67,42 @@ function LevelMaker.generate(width, height)
                     Tile(x, y, tileID, y == 7 and topper or nil, tileset, topperset))
             end
 
+            if x == width - 95 then
+                pole_obj = GameObject{
+                    texture = 'poles',
+                    x = (x - 1) * TILE_SIZE,
+                    y = (4 - 1) * TILE_SIZE,
+                    width = 8,
+                    height = 48,
+    
+                    -- make a random variant
+                    frame = pole_frame,
+                    collidable = false,
+                }
+
+                flag_obj = GameObject{
+                    texture = 'flags',
+                    x = (x - 1) * TILE_SIZE+6,
+                    y = (4 - 1) * TILE_SIZE,
+                    width = 16,
+                    height = 16,
+    
+                    -- make a random variant
+                    frame = flag_frame,
+                    collidable = true,
+                    consumable = true,
+
+                    onConsume = function(player, object)
+                        gSounds['pickup']:play()
+                        gStateMachine:change('play')
+                    end
+                }
+    
+                table.insert(objects, pole_obj)
+                table.insert(objects, flag_obj)
+
             -- chance to generate a pillar
-            if math.random(8) == 1 then
+            elseif math.random(8) == 1 then
                 blockHeight = 2
                 
                 -- chance to generate bush on pillar
@@ -165,29 +207,28 @@ function LevelMaker.generate(width, height)
             -- CS50: chance to spawn a key and a lock
             elseif math.random(10) == 1 and not key then
                 key = true
+
+                key_obj = GameObject{
+                    texture = 'keys_and_locks',
+                    x = (x - 1) * TILE_SIZE,
+                    y = (blockHeight - 1) * TILE_SIZE,
+                    width = 16,
+                    height = 16,
+
+                    -- make a random variant
+                    frame = key_frame,
+                    collidable = true,
+                    consumable = true,
+                    solid = false,
+
+                    -- collision function takes itself
+                    onConsume = function(player, object)
+                        gSounds['pickup']:play()
+                        player.key = true
+                    end
+                }
                 
-                table.insert(objects,
-
-                    GameObject{
-                        texture = 'keys_and_locks',
-                        x = (x - 1) * TILE_SIZE,
-                        y = (blockHeight - 1) * TILE_SIZE,
-                        width = 16,
-                        height = 16,
-
-                        -- make a random variant
-                        frame = key_frame,
-                        collidable = true,
-                        consumable = true,
-                        solid = false,
-
-                        -- collision function takes itself
-                        onConsume = function(player, object)
-                            gSounds['pickup']:play()
-                            player.key = true
-                        end
-                    }
-                )
+                table.insert(objects, key_obj)
             else if math.random(10) == 1 and not lock then
                 lock = true
 
